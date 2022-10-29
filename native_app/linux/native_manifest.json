@@ -1,0 +1,7 @@
+{
+  "name": "youtube.auto.shutdown",
+  "description": "Shuts down the PC after a Youtube video",
+  "path": "/usr/bin/youtube_auto_shutdown_native",
+  "type": "stdio",
+  "allowed_extensions": ["youtube_auto_shutdown@sixshaman.org"]
+}

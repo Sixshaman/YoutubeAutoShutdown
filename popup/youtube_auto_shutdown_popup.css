@@ -1,0 +1,47 @@
+.hidden 
+{
+    display: none;
+}
+  
+.ytshutdown_menu 
+{
+    width: 12.999em;
+    padding: 3%;
+    font-size: 1.3em;
+    background-color: white;
+    position: relative;
+}
+
+.ytshutdown_menu:hover
+{
+    background-color: mistyrose;
+}
+
+.ytshutdown_menu:active
+{
+    background-color: pink;
+}
+
+.ytshutdown_checkbox
+{
+    pointer-events: none;
+    appearance: none;
+    background-color: transparent;
+    border: none;
+    padding: 0.5rem;
+}
+
+.ytshutdown_checkbox:checked:after
+{
+    content: '\2714';
+    font-size: 1.3em;
+    color: darkred;
+    position: absolute;
+    left: 0.3em;
+    top: 0.3em;
+}
+
+.ytshutdown_span
+{
+    z-index: 0;
+}

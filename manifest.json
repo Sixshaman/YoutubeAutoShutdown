@@ -1,0 +1,49 @@
+{
+    "manifest_version": 2,
+    "name": "Youtube Auto Shutdown",
+    "version": "1.0",
+  
+    "description": "Shuts down the PC after Youtube video has finished playing",
+  
+    "icons": 
+    {
+      "48": "icons/youtube_auto_shutdown.svg"
+    },
+
+    "permissions": 
+    [
+      "nativeMessaging"
+    ],
+
+    "browser_specific_settings": 
+    {
+      "gecko": 
+      {
+        "id": "youtube_auto_shutdown@sixshaman.org",
+        "strict_min_version": "60.0"
+      }
+    },
+
+    "background": 
+    {
+      "scripts": ["js/youtube_auto_shutdown_background.js"]
+    },
+
+    "page_action": 
+    {
+      "browser_style": true,
+      "default_icon": "icons/youtube_auto_shutdown.svg",
+      "default_title": "Youtube Auto Shutdown",
+      "default_popup": "popup/youtube_auto_shutdown_popup.html",
+      "show_matches": ["*://*.youtube.com/watch*"]
+    },
+  
+    "content_scripts": 
+    [
+      {
+        "matches": ["*://*.youtube.com/*"],
+        "js": ["js/youtube_auto_shutdown.js"]
+      }
+    ]
+}
+  
