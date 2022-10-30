@@ -14,12 +14,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Windows native app
-        run: cd native_app_src |
-             mkdir out |
-             cmake -B out -G "Visual Studio 17 2022" -A x64 |
-             cmake --build out --config Release |
-             cd out/x64/Release |
-             cmake --install ../../
+        run: 
+          cd native_app_src |
+          mkdir out |
+          cmake -B out -G "Visual Studio 17 2022" -A x64 |
+          cmake --build out --config Release |
+          cd out/x64/Release |
+          cmake --install ../../
              
   build-nativeapp-linux:
     name: Build native app for Linux
@@ -28,12 +29,13 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Build Linux native app
-        run: cd native_app_src |
-             mkdir out |
-             cmake -B out -G "Unix Makefiles" |
-             cmake --build out --config Release |
-             cd out |
-             cmake --install ./
+        run: 
+          cd native_app_src |
+          mkdir out |
+          cmake -B out -G "Unix Makefiles" |
+          cmake --build out --config Release |
+          cd out |
+          cmake --install ./
              
   publish:
     runs-on: ubuntu-latest
