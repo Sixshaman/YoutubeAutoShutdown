@@ -2,6 +2,7 @@
 #include <gtk/gtk.h>
 #include <chrono>
 #include <tuple>
+#include <string>
 
 void systemShutdown()
 {
@@ -54,7 +55,7 @@ void onAppActivated(GtkApplication* app, [[maybe_unused]] gpointer userData)
 
 int ShowShutdownTimeoutDialog(int argc, char* argv[])
 {
-    GtkApplication* app = gtk_application_new("youtube.auto.shutdown", G_APPLICATION_DEFAULT_FLAGS);
+    GtkApplication* app = gtk_application_new("youtube.auto.shutdown", G_APPLICATION_FLAGS_NONE);
     g_signal_connect(app, "activate", G_CALLBACK(onAppActivated), nullptr);
     int status = g_application_run(G_APPLICATION(app), argc, argv);
     g_object_unref(app);
