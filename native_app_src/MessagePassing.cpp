@@ -1,5 +1,6 @@
 #include <vector>
 #include <iostream>
+#include <cstring>
 #include "MessagePassing.h"
 
 //A valid message from/to the browser is preposed with 4-bytes header containing the length

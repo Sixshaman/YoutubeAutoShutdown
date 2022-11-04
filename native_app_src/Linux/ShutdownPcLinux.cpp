@@ -8,7 +8,7 @@ void systemShutdown()
     [[maybe_unused]] int ret = system("shutdown -P now");
 }
 
-void onAppActivated(GtkApplication* app, gpointer userData)
+void onAppActivated(GtkApplication* app, [[maybe_unused]] gpointer userData)
 {
     using TimePoint             = decltype(std::chrono::high_resolution_clock::now());
     using TimeoutCallbackParams = std::tuple<GtkMessageDialog*, TimePoint>;
@@ -21,7 +21,7 @@ void onAppActivated(GtkApplication* app, gpointer userData)
     TimeoutCallbackParams* timeoutParams = new(timeoutParamsStorage) TimeoutCallbackParams(std::make_tuple(GTK_MESSAGE_DIALOG(messageDialog), std::chrono::high_resolution_clock::now()));
     g_timeout_add(100, [](gpointer userData)
     {
-        std::tuple params = *static_cast<TimeoutCallbackParams>(userData);
+        TimeoutCallbackParams params = *static_cast<TimeoutCallbackParams*>(userData);
 
         GtkMessageDialog*       messageDialog = std::get<0>(params);
         std::chrono::time_point startTime     = std::get<1>(params);
