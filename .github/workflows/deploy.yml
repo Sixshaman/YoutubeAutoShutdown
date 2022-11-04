@@ -29,7 +29,9 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Install Gtk 4
-        run: sudo apt-get install libgtk-4-1
+        run: |
+          sudo apt-get update
+          sudo apt-get install libgtk-4-1
       - name: Build Linux native app
         run: |
           cd native_app_src
