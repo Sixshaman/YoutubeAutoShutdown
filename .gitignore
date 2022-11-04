@@ -1,4 +1,7 @@
 native_app_src/.vs
+native_app_src/.idea
 native_app_src/out
+native_app_src/cmake-build-debug
+native_app_src/cmake-build-release
 native_app/linux/youtube_auto_shutdown_native
 native_app/windows/youtube_auto_shutdown_native.exe
