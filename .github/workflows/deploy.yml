@@ -63,6 +63,8 @@ jobs:
       run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Windows/native_app
     - name: Create native app deploy folder (Linux)
       run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Linux/native_app
+      
+      
     - name: Copy manifest
       uses: canastro/copy-file-action@master
       with:
@@ -86,7 +88,13 @@ jobs:
         source: "popup"
         target: "YoutubeAutoShutdown-Web/popup"
         flags: "-r"
-    - name: Copy native app for Windows
+        
+        
+    - name: Download Windows native app
+      uses: actions/download-artifact@v3
+      with:
+        name: windows-native-app
+    - name: Copy native manifest for Windows
       uses: canastro/copy-file-action@master
       with:
         source: "native_app/windows"
@@ -97,7 +105,18 @@ jobs:
       with:
         source: "install_windows.bat"
         target: "YoutubeAutoShutdown-Windows/install.bat"
-    - name: Copy native app for Linux
+    - name: Copy native app for Windows
+      uses: canastro/copy-file-action@master
+      with:
+        source: "youtube_auto_shutdown_native.exe"
+        target: "YoutubeAutoShutdown-Windows/native_app/windows/youtube_auto_shutdown_native.exe"
+        
+        
+    - name: Download Linux native app
+      uses: actions/download-artifact@v3
+      with:
+        name: linux-native-app
+    - name: Copy native manifest for Linux
       uses: canastro/copy-file-action@master
       with:
         source: "native_app/linux"
@@ -108,16 +127,13 @@ jobs:
       with:
         source: "install_linux.sh"
         target: "YoutubeAutoShutdown-Linux/install.sh"
-    - name: Download Windows native app
-      uses: actions/download-artifact@v3
+    - name: Copy native app for Linux
+      uses: canastro/copy-file-action@master
       with:
-        name: windows-native-app
-        path: YoutubeAutoShutdown-Windows/native_app/windows/
-    - name: Download Linux native app
-      uses: actions/download-artifact@v3
-      with:
-        name: linux-native-app
-        path: YoutubeAutoShutdown-Linux/native_app/linux/
+        source: "youtube_auto_shutdown_native"
+        target: "YoutubeAutoShutdown-Linux/native_app/linux/youtube_auto_shutdown_native"
+        
+        
     - name: Zip release (main extension)
       uses: montudor/action-zip@v1
       with:
