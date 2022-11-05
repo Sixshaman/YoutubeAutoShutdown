@@ -112,12 +112,12 @@ jobs:
       uses: actions/download-artifact@v3
       with:
         name: windows-native-app
-        path: YoutubeAutoShutdown-Windows/
+        path: YoutubeAutoShutdown-Windows/native_app/windows/
     - name: Download Linux native app
       uses: actions/download-artifact@v3
       with:
         name: linux-native-app
-        path: YoutubeAutoShutdown-Linux/
+        path: YoutubeAutoShutdown-Linux/native_app/linux/
     - name: Zip release (main extension)
       uses: montudor/action-zip@v1
       with:
