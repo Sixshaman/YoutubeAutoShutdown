@@ -49,9 +49,9 @@ jobs:
     - name: Create deploy folder (main extension)
       run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Web
     - name: Create native app deploy folder (Windows)
-      run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Windows/native_app/windows
+      run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Windows
     - name: Create native app deploy folder (Linux)
-      run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Linux/native_app/linux
+      run: mkdir -p ${GITHUB_WORKSPACE}/YoutubeAutoShutdown-Linux
     - name: Copy manifest
       uses: canastro/copy-file-action@master
       with:
@@ -79,7 +79,7 @@ jobs:
       uses: canastro/copy-file-action@master
       with:
         source: "native_app/windows"
-        target: "YoutubeAutoShutdown-Windows/native_app/windows"
+        target: "YoutubeAutoShutdown-Windows"
         flags: "-r"
     - name: Copy install script for Windows
       uses: canastro/copy-file-action@master
@@ -90,7 +90,7 @@ jobs:
       uses: canastro/copy-file-action@master
       with:
         source: "native_app/linux"
-        target: "YoutubeAutoShutdown-Linux/native_app/linux"
+        target: "YoutubeAutoShutdown-Linux"
         flags: "-r"
     - name: Copy install script for Linux
       uses: canastro/copy-file-action@master
