@@ -10,7 +10,7 @@ jobs:
   build-nativeapp-windows:
     name: Build native app for Windows
     runs-on: windows-latest
-    
+
     steps:
       - uses: actions/checkout@v2
       - name: Build Windows native app
@@ -21,6 +21,12 @@ jobs:
           cmake --build out --config Release
           cd out/x64/Release
           cmake --install ../../
+          cd ../../../../
+      - uses: actions/upload-artifact@v3
+        with:
+          name: windows-native-app
+          path: native_app/windows/youtube_auto_shutdown_native.exe
+        
              
   build-nativeapp-linux:
     name: Build native app for Linux
@@ -39,6 +45,11 @@ jobs:
           cmake --build out --config Release
           cd out
           cmake --install ./
+          cd ../../
+      - uses: actions/upload-artifact@v3
+        with:
+          name: linux-native-app
+          path: native_app/linux/youtube_auto_shutdown_native
              
   publish:
     runs-on: ubuntu-latest
@@ -97,6 +108,16 @@ jobs:
       with:
         source: "install_linux.sh"
         target: "YoutubeAutoShutdown-Linux/install.sh"
+    - name: Download Windows native app
+      uses: actions/download-artifact@v3
+      with:
+        name: windows-native-app
+        path: YoutubeAutoShutdown-Windows/native_app/windows
+    - name: Download Linux native app
+      uses: actions/download-artifact@v3
+      with:
+        name: linux-native-app
+        path: YoutubeAutoShutdown-Linux/native_app/linux
     - name: Zip release (main extension)
       uses: montudor/action-zip@v1
       with:
