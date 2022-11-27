@@ -105,6 +105,11 @@ jobs:
       with:
         source: "install_windows.bat"
         target: "YoutubeAutoShutdown-Windows/install.bat"
+    - name: Copy uninstall script for Windows
+      uses: canastro/copy-file-action@master
+      with:
+        source: "uninstall_windows.bat"
+        target: "YoutubeAutoShutdown-Windows/uninstall.bat"
     - name: Copy native app for Windows
       uses: canastro/copy-file-action@master
       with:
@@ -127,6 +132,11 @@ jobs:
       with:
         source: "install_linux.sh"
         target: "YoutubeAutoShutdown-Linux/install.sh"
+    - name: Copy uninstall script for Linux
+      uses: canastro/copy-file-action@master
+      with:
+        source: "uninstall_linux.sh"
+        target: "YoutubeAutoShutdown-Linux/uninstall.sh"   
     - name: Copy native app for Linux
       uses: canastro/copy-file-action@master
       with:
