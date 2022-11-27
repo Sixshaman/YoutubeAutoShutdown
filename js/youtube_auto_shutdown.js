@@ -122,10 +122,32 @@ function registerTab()
     return browser.runtime.sendMessage({message: "ytshutdown_register_tab", payload: messagePayload});
 }
 
-function onVideoEnded(event)
+function onVideoEnded()
 {
     let messagePayload = {playlistEnded: isLastPlaylistEntry()};
     browser.runtime.sendMessage({message: "ytshutdown_video_ended", payload: messagePayload});
+}
+
+function registerVideoEndEvent()
+{
+    let videoElements = document.getElementsByTagName("video");
+    if(videoElements.length == 0)
+    {
+        return;
+    }
+
+    videoElements[0].addEventListener("ended", onVideoEnded);
+}
+
+function unregisterVideoEndEvent()
+{
+    let videoElements = document.getElementsByTagName("video");
+    if(videoElements.length == 0)
+    {
+        return;
+    }
+
+    videoElements[0].removeEventListener("ended", onVideoEnded);
 }
 
 function ytShutdownEntryPoint()
@@ -134,15 +156,9 @@ function ytShutdownEntryPoint()
     {
         if(request.message == "ytshutdown_enable_shutdown")
         {
-            let videoElements = document.getElementsByTagName("video");
-            if(videoElements.length == 0)
-            {
-                return Promise.resolve();
-            }
-
             if(!request.payload.anyShutdown)
             {
-                videoElements[0].removeEventListener("ended", onVideoEnded);
+                window.eval(`unregisterVideoEndEvent();`);
                 return Promise.resolve();
             }
             else
@@ -153,7 +169,7 @@ function ytShutdownEntryPoint()
                     {
                         if(response.status == "ok")
                         {
-                            videoElements[0].addEventListener("ended", onVideoEnded);
+                            window.eval(`registerVideoEndEvent();`);
                             return Promise.resolve();
                         }
                         else if(response.status == "user-error")
@@ -172,6 +188,12 @@ function ytShutdownEntryPoint()
 
         return Promise.resolve();
     });
+
+    exportFunction(getPlaylistInfo,         window, { defineAs: "getPlaylistInfo" });
+    exportFunction(isLastPlaylistEntry,     window, { defineAs: "isLastPlaylistEntry" });
+    exportFunction(onVideoEnded,            window, { defineAs: "onVideoEnded" });
+    exportFunction(registerVideoEndEvent,   window, { defineAs: "registerVideoEndEvent" });
+    exportFunction(unregisterVideoEndEvent, window, { defineAs: "unregisterVideoEndEvent" });
 
     registerTab();
 }
