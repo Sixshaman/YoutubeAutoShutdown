@@ -1,8 +1,11 @@
 function showErrorHeader(errorText)
 {
-    const docZIndices         = Array.from(document.querySelectorAll("body *"), element => window.getComputedStyle(element).zIndex);
-    const docZIndicesFiltered = docZIndices.map(zIndexStr => parseFloat(zIndexStr)).filter(zIndex => !Number.isNaN(zIndex));
-    const highestZIndex       = Math.max(...docZIndicesFiltered, 0);
+    let getElementZIndex = (element) => window.getComputedStyle(element).zIndex;
+
+    const zIndexProperties = Array.from(document.querySelectorAll("body *"), getElementZIndex);
+    const zIndexValues     = zIndexProperties.map((str) => parseFloat(str));
+    const validZIndices    = zIndexValues.filter((num) => !Number.isNaN(num));
+    const highestZIndex    = Math.max(...validZIndices, 0);
 
     const headerZIndex      = highestZIndex + 1;
     const closeButtonZIndex = highestZIndex + 2;
