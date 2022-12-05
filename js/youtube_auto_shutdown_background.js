@@ -45,10 +45,20 @@ function handleContentScriptMessage(request, sender, sendResponse)
     {
         if(request.message == "ytshutdown_register_tab")
         {
+            let oldTabParameters = ytshutdownTabParameters[sender.tab.id];
+            if(oldTabParameters === undefined)
+            {
+                oldTabParameters = {shutdownAfterVideo: false, shutdownAfterPlaylist: false};
+            }
+            else if(oldTabParameters.shutdownAfterPlaylist && !request.payload.hasPlaylist)
+            {
+                oldTabParameters.shutdownAfterPlaylist = false;
+            }
+
             ytshutdownTabParameters[sender.tab.id] = 
             {
-                shutdownAfterVideo:    false,
-                shutdownAfterPlaylist: false,
+                shutdownAfterVideo:    oldTabParameters.shutdownAfterVideo,
+                shutdownAfterPlaylist: oldTabParameters.shutdownAfterPlaylist,
                 hasPlaylist:           request.payload.hasPlaylist
             };
 
@@ -136,5 +146,10 @@ browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
         return Promise.reject(new Error("Tab not registered"));
     }
 
-    return browser.tabs.sendMessage(tabId, {message: "ytshutdown_update_tab"});
+    let messagePayload = 
+    {
+        shutdownEnabled: tabParameters.shutdownAfterPlaylist
+    };
+
+    return browser.tabs.sendMessage(tabId, {message: "ytshutdown_update_tab", payload: messagePayload});
 });

@@ -115,13 +115,6 @@ function isLastPlaylistEntry()
     return playlistInfo.index >= playlistInfo.size;
 }
 
-function registerTab()
-{
-    let queryString = new URLSearchParams(window.location.search);
-    let messagePayload = {hasPlaylist: queryString.has("list")};
-    return browser.runtime.sendMessage({message: "ytshutdown_register_tab", payload: messagePayload});
-}
-
 function onVideoEnded()
 {
     let messagePayload = {playlistEnded: isLastPlaylistEntry()};
@@ -148,6 +141,19 @@ function unregisterVideoEndEvent()
     }
 
     videoElements[0].removeEventListener("ended", onVideoEnded);
+}
+
+function registerTab()
+{
+    exportFunction(getPlaylistInfo,         window, { defineAs: "getPlaylistInfo" });
+    exportFunction(isLastPlaylistEntry,     window, { defineAs: "isLastPlaylistEntry" });
+    exportFunction(onVideoEnded,            window, { defineAs: "onVideoEnded" });
+    exportFunction(registerVideoEndEvent,   window, { defineAs: "registerVideoEndEvent" });
+    exportFunction(unregisterVideoEndEvent, window, { defineAs: "unregisterVideoEndEvent" });
+
+    let queryString = new URLSearchParams(window.location.search);
+    let messagePayload = {hasPlaylist: queryString.has("list")};
+    return browser.runtime.sendMessage({message: "ytshutdown_register_tab", payload: messagePayload});
 }
 
 function ytShutdownEntryPoint()
@@ -183,17 +189,17 @@ function ytShutdownEntryPoint()
         }
         else if(request.message == "ytshutdown_update_tab")
         {
-            return registerTab();
+            return registerTab().then(function()
+            {
+                if(request.payload.shutdownEnabled)
+                {
+                    window.eval(`registerVideoEndEvent();`);
+                }
+            });
         }
 
         return Promise.resolve();
     });
-
-    exportFunction(getPlaylistInfo,         window, { defineAs: "getPlaylistInfo" });
-    exportFunction(isLastPlaylistEntry,     window, { defineAs: "isLastPlaylistEntry" });
-    exportFunction(onVideoEnded,            window, { defineAs: "onVideoEnded" });
-    exportFunction(registerVideoEndEvent,   window, { defineAs: "registerVideoEndEvent" });
-    exportFunction(unregisterVideoEndEvent, window, { defineAs: "unregisterVideoEndEvent" });
 
     registerTab();
 }
