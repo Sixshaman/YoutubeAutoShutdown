@@ -142,6 +142,12 @@ jobs:
       with:
         source: "youtube_auto_shutdown_native"
         target: "YoutubeAutoShutdown-Linux/native_app/linux/youtube_auto_shutdown_native"
+    - name: Set native app executable
+      run: chmod +x YoutubeAutoShutdown-Linux/native_app/linux/youtube_auto_shutdown_native
+    - name: Set install script executable
+      run: chmod +x YoutubeAutoShutdown-Linux/install.sh
+    - name: Set uninstall script executable
+      run: chmod +x YoutubeAutoShutdown-Linux/uninstall.sh
         
         
     - name: Zip release (main extension)
