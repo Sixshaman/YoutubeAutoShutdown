@@ -103,7 +103,7 @@ function handleContentScriptMessage(request, sender, sendResponse)
                 return Promise.reject(new Error("Tab not registered"));
             }
 
-            let messagePayload = {anyShutdown: request.payload.videoShutdown || request.payload.playlistEnded};
+            let messagePayload = {anyShutdown: request.payload.videoShutdown || request.payload.playlistShutdown};
             let scriptRequest = {message: "ytshutdown_enable_shutdown", payload: messagePayload};
             return browser.tabs.sendMessage(request.tabId, scriptRequest).then
             (
