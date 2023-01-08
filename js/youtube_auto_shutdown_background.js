@@ -74,11 +74,17 @@ function handleContentScriptMessage(request, sender, sendResponse)
 
             if(tabParameters.shutdownAfterVideo)
             {
-                return sendAutoShutdownSignal();
+                return sendAutoShutdownSignal().then(function()
+                {
+                    tabParameters.shutdownAfterVideo = false;
+                });
             }
             else if(tabParameters.shutdownAfterPlaylist && request.payload.playlistEnded)
             {
-                return sendAutoShutdownSignal();
+                return sendAutoShutdownSignal().then(function()
+                {
+                    tabParameters.shutdownAfterPlaylist = false;
+                });
             }
             else
             {
