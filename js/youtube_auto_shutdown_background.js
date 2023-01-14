@@ -76,14 +76,14 @@ function handleContentScriptMessage(request, sender, sendResponse)
             {
                 return sendAutoShutdownSignal().then(function()
                 {
-                    tabParameters.shutdownAfterVideo = false;
+                    ytshutdownTabParameters[sender.tab.id].shutdownAfterVideo = false;
                 });
             }
             else if(tabParameters.shutdownAfterPlaylist && request.payload.playlistEnded)
             {
                 return sendAutoShutdownSignal().then(function()
                 {
-                    tabParameters.shutdownAfterPlaylist = false;
+                    ytshutdownTabParameters[sender.tab.id].shutdownAfterPlaylist = false;
                 });
             }
             else
