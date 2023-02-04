@@ -1,3 +1,4 @@
+//Sends a message with a payload to the background script of the active tab
 function sendBackgroundScriptMessage(message, payload, onResponse, onError)
 {
     browser.tabs.query({active: true, currentWindow: true}).then(function(tabs) 
@@ -18,12 +19,14 @@ function onVideoShutdownClicked()
     let newPlaylistCheckboxState = playlistShutdownCheckbox.checked;
     if(newVideoCheckboxState)
     {
+        //Only one of two options may be active at a time
         newPlaylistCheckboxState = false;   
     }
 
     sendBackgroundScriptMessage("ytshutdown_set_settings", {videoShutdown: newVideoCheckboxState, playlistShutdown: newPlaylistCheckboxState},
     (_response) => 
     {
+        //Only update the checkbox states if the native app check passed successfully
         playlistShutdownCheckbox.checked = newPlaylistCheckboxState;
         videoShutdownCheckbox.checked    = newVideoCheckboxState;
     },
@@ -39,12 +42,14 @@ function onPlaylistShutdownClicked()
     let newVideoCheckboxState    = videoShutdownCheckbox.checked;
     if(newPlaylistCheckboxState)
     {
+        //Only one of two options may be active at a time
         newVideoCheckboxState = false;   
     }
 
     sendBackgroundScriptMessage("ytshutdown_set_settings", {videoShutdown: newVideoCheckboxState, playlistShutdown: newPlaylistCheckboxState},
     (_response) => 
     {
+        //Only update the checkbox states if the native app check passed successfully
         playlistShutdownCheckbox.checked = newPlaylistCheckboxState;
         videoShutdownCheckbox.checked    = newVideoCheckboxState;
     },
@@ -59,6 +64,7 @@ function ytShutdownPopupMain()
     sendBackgroundScriptMessage("ytshutdown_get_settings", null,
     (response) =>
     {
+        //Display current state
         document.getElementById("YtShutdownOptionVideoCheckbox").checked    = response.shutdownAfterVideo;
         document.getElementById("YtShutdownOptionPlaylistCheckbox").checked = response.shutdownAfterPlaylist;
 

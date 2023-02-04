@@ -1,3 +1,4 @@
+//Displays error header on top of the page
 function showErrorHeader(errorText)
 {
     let getElementZIndex = (element) => window.getComputedStyle(element).zIndex;
@@ -71,6 +72,7 @@ function showErrorHeader(errorText)
     }, false);
 }
 
+//Returns the current index and the number of items in the video playlist
 function getPlaylistInfo()
 {
     const content = document.getElementById("content");
@@ -145,6 +147,8 @@ function unregisterVideoEndEvent()
 
 function registerTab()
 {
+    //DOM-accessing functions need to be executed in window context
+    //https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/Sharing_objects_with_page_scripts
     exportFunction(getPlaylistInfo,         window, { defineAs: "getPlaylistInfo" });
     exportFunction(onVideoEnded,            window, { defineAs: "onVideoEnded" });
     exportFunction(registerVideoEndEvent,   window, { defineAs: "registerVideoEndEvent" });

@@ -1,5 +1,6 @@
 let ytshutdownTabParameters = new Object();
 
+//Sends a test message to the native app, checking if it works
 function testAutoShutdownSignal()
 {
     return browser.runtime.sendNativeMessage("youtube.auto.shutdown", "check").then(
@@ -20,6 +21,7 @@ function testAutoShutdownSignal()
     });
 }
 
+//Sends a "PC shutdown" message to the native app
 function sendAutoShutdownSignal()
 {
     return browser.runtime.sendNativeMessage("youtube.auto.shutdown", "shutdown").then(
@@ -39,20 +41,23 @@ function handleContentScriptMessage(request, sender, sendResponse)
     {
         if(request.message == "ytshutdown_register_tab")
         {
-            let oldTabParameters = ytshutdownTabParameters[sender.tab.id];
-            if(oldTabParameters === undefined)
+            //YouTube video tab opened/updated, update tab shutdown settings
+            let tabParameters = ytshutdownTabParameters[sender.tab.id];
+            if(tabParameters === undefined)
             {
-                oldTabParameters = {shutdownAfterVideo: false, shutdownAfterPlaylist: false};
+                //New YouTube tab opened, initialize new shutdown settings
+                tabParameters = {shutdownAfterVideo: false, shutdownAfterPlaylist: false};
             }
-            else if(oldTabParameters.shutdownAfterPlaylist && !request.payload.hasPlaylist)
+            else if(tabParameters.shutdownAfterPlaylist && !request.payload.hasPlaylist)
             {
-                oldTabParameters.shutdownAfterPlaylist = false;
+                //Existing YouTube tab updated, and the current page doesn't contain a playlist. Disable playlist shutdown
+                tabParameters.shutdownAfterPlaylist = false;
             }
 
             ytshutdownTabParameters[sender.tab.id] = 
             {
-                shutdownAfterVideo:    oldTabParameters.shutdownAfterVideo,
-                shutdownAfterPlaylist: oldTabParameters.shutdownAfterPlaylist,
+                shutdownAfterVideo:    tabParameters.shutdownAfterVideo,
+                shutdownAfterPlaylist: tabParameters.shutdownAfterPlaylist,
                 hasPlaylist:           request.payload.hasPlaylist
             };
 
@@ -60,6 +65,7 @@ function handleContentScriptMessage(request, sender, sendResponse)
         }
         else if(request.message == "ytshutdown_video_ended")
         {
+            //Video end detected, send a message to the native app
             let tabParameters = ytshutdownTabParameters[sender.tab.id];
             if(!tabParameters)
             {
@@ -73,17 +79,20 @@ function handleContentScriptMessage(request, sender, sendResponse)
             {
                 return sendAutoShutdownSignal().then(function()
                 {
+                    //Reset the tab shutdown settings
                     ytshutdownTabParameters[sender.tab.id].shutdownAfterVideo    = false;
                     ytshutdownTabParameters[sender.tab.id].shutdownAfterPlaylist = false;
                 });
             }
             else
             {
+                //Do nothing, shutdown not needed
                 return Promise.resolve();
             }
         }
         else if(request.message == "ytshutdown_get_settings")
         {
+            //Return the tab shutdown settings
             let tabParameters = ytshutdownTabParameters[request.tabId];
             if(!tabParameters)
             {
@@ -94,6 +103,7 @@ function handleContentScriptMessage(request, sender, sendResponse)
         }
         else if(request.message == "ytshutdown_set_settings")
         {
+            //Update the tab shutdown parameters
             let tabParameters = ytshutdownTabParameters[request.tabId];
             if(!tabParameters)
             {
@@ -103,6 +113,7 @@ function handleContentScriptMessage(request, sender, sendResponse)
             return testAutoShutdownSignal().then(
             (_response) => 
             {
+                //Native app responded successfully, ask the tab to register video end event
                 tabParameters.shutdownAfterVideo    = request.payload.videoShutdown;
                 tabParameters.shutdownAfterPlaylist = request.payload.playlistShutdown;
 
@@ -113,6 +124,7 @@ function handleContentScriptMessage(request, sender, sendResponse)
             })
             .catch((error) => 
             {
+                //Native app error, ask the tab to show error header
                 let scriptRequest = {message: "ytshutdown_show_error", payload: error.message};
                 return browser.tabs.sendMessage(request.tabId, scriptRequest);
             });
