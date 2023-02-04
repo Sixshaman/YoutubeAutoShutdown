@@ -7,20 +7,17 @@ function testAutoShutdownSignal()
     {
         if(response == "ok")
         {
-            return Promise.resolve({status: "ok"});
+            return Promise.resolve();
         }
         else
         {
-            return Promise.resolve({status: "user-error", reason: "Received an error from native application: " + response});
+            return Promise.reject({message: "Received an error from native application: " + response});
         }
     })
-    .catch
-    (
-        (_error) => 
-        {
-            return Promise.resolve({status: "user-error", reason: "Youtube Auto Shutdown error. Is native application installed?"});
-        }
-    );
+    .catch((_error) => 
+    {
+        return Promise.reject({message: "Youtube Auto Shutdown error. Is native application installed?"});
+    });
 }
 
 function sendAutoShutdownSignal()
@@ -28,15 +25,12 @@ function sendAutoShutdownSignal()
     return browser.runtime.sendNativeMessage("youtube.auto.shutdown", "shutdown").then(
     (_response) => 
     {
-        return Promise.resolve({status: "ok"});
+        return Promise.resolve();
     })
-    .catch
-    (
-        (_error) => 
-        {
-            return Promise.resolve({status: "user-error", reason: "Youtube Auto Shutdown error. Is native application installed?"});
-        }
-    );
+    .catch((_error) => 
+    {
+        return Promise.reject({message: "Youtube Auto Shutdown error. Is native application installed?"});
+    });
 }
 
 function handleContentScriptMessage(request, sender, sendResponse)
@@ -72,17 +66,14 @@ function handleContentScriptMessage(request, sender, sendResponse)
                 return Promise.reject(new Error("Tab not registered"));
             }
 
-            if(tabParameters.shutdownAfterVideo)
+            let shutdownAfterVideo    = tabParameters.shutdownAfterVideo;
+            let shutdownAfterPlaylist = tabParameters.shutdownAfterPlaylist && request.payload.playlistEnded;
+
+            if(shutdownAfterVideo || shutdownAfterPlaylist)
             {
                 return sendAutoShutdownSignal().then(function()
                 {
-                    ytshutdownTabParameters[sender.tab.id].shutdownAfterVideo = false;
-                });
-            }
-            else if(tabParameters.shutdownAfterPlaylist && request.payload.playlistEnded)
-            {
-                return sendAutoShutdownSignal().then(function()
-                {
+                    ytshutdownTabParameters[sender.tab.id].shutdownAfterVideo    = false;
                     ytshutdownTabParameters[sender.tab.id].shutdownAfterPlaylist = false;
                 });
             }
@@ -109,53 +100,52 @@ function handleContentScriptMessage(request, sender, sendResponse)
                 return Promise.reject(new Error("Tab not registered"));
             }
 
-            let messagePayload = {anyShutdown: request.payload.videoShutdown || request.payload.playlistShutdown};
-            let scriptRequest = {message: "ytshutdown_enable_shutdown", payload: messagePayload};
-            return browser.tabs.sendMessage(request.tabId, scriptRequest).then
-            (
-                (_response) =>
-                {
-                    tabParameters.shutdownAfterVideo    = request.payload.videoShutdown;
-                    tabParameters.shutdownAfterPlaylist = request.payload.playlistShutdown;
-
-                    return Promise.resolve();
-                }
-            );
-        }
-        else if(request.message == "ytshutdown_check_native_app")
-        {
-            let tabParameters = ytshutdownTabParameters[sender.tab.id];
-            if(!tabParameters)
+            return testAutoShutdownSignal().then(
+            (_response) => 
             {
-                return Promise.reject(new Error("Tab not registered"));
-            }
+                tabParameters.shutdownAfterVideo    = request.payload.videoShutdown;
+                tabParameters.shutdownAfterPlaylist = request.payload.playlistShutdown;
 
-            return testAutoShutdownSignal();
+                let messagePayload = {anyShutdown: request.payload.videoShutdown || request.payload.playlistShutdown};
+                let scriptRequest = {message: "ytshutdown_enable_shutdown", payload: messagePayload};
+
+                return browser.tabs.sendMessage(request.tabId, scriptRequest);
+            })
+            .catch((error) => 
+            {
+                let scriptRequest = {message: "ytshutdown_show_error", payload: error.message};
+                return browser.tabs.sendMessage(request.tabId, scriptRequest);
+            });
         }
     }
 
     return false;
 }
 
-browser.runtime.onMessage.addListener(handleContentScriptMessage);
-
-browser.tabs.onRemoved.addListener(function(tabId, removeInfo)
+function ytShutdownBackgroundEntryPoint()
 {
-    delete ytshutdownTabParameters[tabId];
-});
+    browser.runtime.onMessage.addListener(handleContentScriptMessage);
 
-browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
-{
-    let tabParameters = ytshutdownTabParameters[tabId];
-    if(!tabParameters)
+    browser.tabs.onRemoved.addListener(function(tabId, removeInfo)
     {
-        return Promise.reject(new Error("Tab not registered"));
-    }
-
-    let messagePayload = 
+        delete ytshutdownTabParameters[tabId];
+    });
+    
+    browser.tabs.onUpdated.addListener(function(tabId, changeInfo, tab)
     {
-        shutdownEnabled: tabParameters.shutdownAfterPlaylist
-    };
+        let tabParameters = ytshutdownTabParameters[tabId];
+        if(!tabParameters)
+        {
+            return Promise.reject(new Error("Tab not registered"));
+        }
+    
+        let messagePayload = 
+        {
+            shutdownEnabled: tabParameters.shutdownAfterPlaylist
+        };
+    
+        return browser.tabs.sendMessage(tabId, {message: "ytshutdown_update_tab", payload: messagePayload});
+    });    
+}
 
-    return browser.tabs.sendMessage(tabId, {message: "ytshutdown_update_tab", payload: messagePayload});
-});
+ytShutdownBackgroundEntryPoint();

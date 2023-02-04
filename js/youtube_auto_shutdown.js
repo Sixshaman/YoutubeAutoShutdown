@@ -112,15 +112,12 @@ function getPlaylistInfo()
     return {index: Number(playlistInfoNodes[0].textContent), size: Number(playlistInfoNodes[2].textContent)};
 }
 
-function isLastPlaylistEntry()
-{
-    let playlistInfo = getPlaylistInfo();
-    return playlistInfo.index >= playlistInfo.size;
-}
-
 function onVideoEnded()
 {
-    let messagePayload = {playlistEnded: isLastPlaylistEntry()};
+    let playlistInfo = getPlaylistInfo();
+    let isLastPlaylistEntry = playlistInfo.index >= playlistInfo.size;
+
+    let messagePayload = {playlistEnded: isLastPlaylistEntry};
     browser.runtime.sendMessage({message: "ytshutdown_video_ended", payload: messagePayload});
 }
 
@@ -149,7 +146,6 @@ function unregisterVideoEndEvent()
 function registerTab()
 {
     exportFunction(getPlaylistInfo,         window, { defineAs: "getPlaylistInfo" });
-    exportFunction(isLastPlaylistEntry,     window, { defineAs: "isLastPlaylistEntry" });
     exportFunction(onVideoEnded,            window, { defineAs: "onVideoEnded" });
     exportFunction(registerVideoEndEvent,   window, { defineAs: "registerVideoEndEvent" });
     exportFunction(unregisterVideoEndEvent, window, { defineAs: "unregisterVideoEndEvent" });
@@ -172,23 +168,14 @@ function ytShutdownEntryPoint()
             }
             else
             {
-                return browser.runtime.sendMessage({message: "ytshutdown_check_native_app"}).then
-                (
-                    (response) =>
-                    {
-                        if(response.status == "ok")
-                        {
-                            window.eval(`registerVideoEndEvent();`);
-                            return Promise.resolve();
-                        }
-                        else if(response.status == "user-error")
-                        {
-                            showErrorHeader(response.reason);
-                            return Promise.reject(new Error("Native application error"));
-                        }
-                    }
-                );
+                window.eval(`registerVideoEndEvent();`);
+                return Promise.resolve();
             }
+        }
+        else if(request.message == "ytshutdown_show_error")
+        {
+            showErrorHeader(request.payload);
+            return Promise.resolve();
         }
         else if(request.message == "ytshutdown_update_tab")
         {
