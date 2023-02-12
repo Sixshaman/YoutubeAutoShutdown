@@ -159,15 +159,15 @@ jobs:
     - name: Zip release (main extension)
       uses: montudor/action-zip@v1
       with:
-        args: zip -qq "YoutubeAutoShutdown-WebExtension.zip" "YoutubeAutoShutdown-Web/*"
+        args: zip -qq "YoutubeAutoShutdown-WebExtension.zip" YoutubeAutoShutdown-Web/*
     - name: Zip release (Windows native app)
       uses: montudor/action-zip@v1
       with:
-        args: zip -qq "YoutubeAutoShutdown-NativeApp-Windows.zip" "YoutubeAutoShutdown-Windows/*"
+        args: zip -qq "YoutubeAutoShutdown-NativeApp-Windows.zip" YoutubeAutoShutdown-Windows/*
     - name: Zip release (Linux native app)
       uses: montudor/action-zip@v1
       with:
-        args: zip -qq "YoutubeAutoShutdown-NativeApp-Linux.zip" "YoutubeAutoShutdown-Linux/*"
+        args: zip -qq "YoutubeAutoShutdown-NativeApp-Linux.zip" YoutubeAutoShutdown-Linux/*
     - name: Get release name
       id: release_name
       run: echo "::set-output name=relname::$(date +'Build %Y-%m-%d %H:%M:%S')"
