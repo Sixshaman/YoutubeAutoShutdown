@@ -157,11 +157,11 @@ jobs:
       run: ls YoutubeAutoShutdown-Web/
         
     - name: Zip release (main extension)
-      run: zip -qq -r "YoutubeAutoShutdown-WebExtension.zip" YoutubeAutoShutdown-Web/*
+      run: (cd YoutubeAutoShutdown-Web && zip -qq -r ../YoutubeAutoShutdown-WebExtension.zip .)
     - name: Zip release (Windows native app)
-      run: zip -qq -r "YoutubeAutoShutdown-NativeApp-Windows.zip" YoutubeAutoShutdown-Windows/*
+      run: (cd YoutubeAutoShutdown-Windows && zip -qq -r ../YoutubeAutoShutdown-NativeApp-Windows.zip .)
     - name: Zip release (Linux native app)
-      run: zip -qq -r "YoutubeAutoShutdown-NativeApp-Linux.zip" YoutubeAutoShutdown-Linux/*
+      run: (cd YoutubeAutoShutdown-Linux && zip -qq -r ../YoutubeAutoShutdown-NativeApp-Linux.zip .)
     - name: Get release name
       id: release_name
       run: echo "::set-output name=relname::$(date +'Build %Y-%m-%d %H:%M:%S')"
