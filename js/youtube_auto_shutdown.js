@@ -1,5 +1,5 @@
 //Displays error header on top of the page
-function showErrorHeader(errorText)
+function showErrorHeader(errorInfo)
 {
     let getElementZIndex = (element) => window.getComputedStyle(element).zIndex;
 
@@ -17,15 +17,38 @@ function showErrorHeader(errorText)
         document.body.removeChild(oldErrorHeader);
     }
 
-    let divText = document.createElement("p");
-    divText.style.marginTop = "0px";
-    divText.style.width     = "100%";
-    divText.style.position  = "absolute";
-    divText.style.zIndex    = headerZIndex.toString();
+    let divNativeAppText = document.createElement("p");
+    divNativeAppText.style.marginTop = "0px";
+    divNativeAppText.style.zIndex    = headerZIndex.toString();
 
-    let divTextContent = document.createTextNode(errorText);
-    divText.appendChild(divTextContent);
-    
+    let divNativeAppLink = document.createElement("a");
+    if(errorInfo.link == "")
+    {
+        divNativeAppText.style.width = "100%";
+
+        let divTextContent = document.createTextNode(errorInfo.message + errorInfo.suggestion);
+        divNativeAppText.appendChild(divTextContent);
+    }
+    else
+    {
+        divNativeAppText.style.width        = "50%";
+        divNativeAppText.style.textAlign    = "right";   
+        divNativeAppText.style.paddingRight = "0.4em";
+
+        let divTextContent = document.createTextNode(errorInfo.message);
+        divNativeAppText.appendChild(divTextContent);
+
+        divNativeAppLink.href = errorInfo.link;
+        divNativeAppLink.style.marginTop = "0px";
+        divNativeAppLink.style.width     = "50%";
+        divNativeAppLink.style.textAlign = "left";
+        divNativeAppLink.style.color     = "gold";
+        divNativeAppLink.style.zIndex    = headerZIndex.toString();
+
+        let divLinkContent = document.createTextNode(errorInfo.suggestion);
+        divNativeAppLink.appendChild(divLinkContent);
+    }
+
     let divCloseButton = document.createElement("p");
     divCloseButton.setAttribute("id", "CloseErrorMessageX");
     divCloseButton.style.marginTop   = "0px";
@@ -45,11 +68,12 @@ function showErrorHeader(errorText)
     errorHeader.style.fontSize      = "25px";
     errorHeader.style.textAlign     = "center";
     errorHeader.style.display       = "flex";
-    errorHeader.style.flexDirection = "column";
+    errorHeader.style.flexDirection = "row";
     errorHeader.style.alignItems    = "flex-end";
     errorHeader.style.zIndex        = headerZIndex.toString();
 
-    errorHeader.appendChild(divText);
+    errorHeader.appendChild(divNativeAppText);
+    errorHeader.appendChild(divNativeAppLink);
     errorHeader.appendChild(divCloseButton);
 
     errorHeader.setAttribute("id", "YoutubeShutdownErrorHeader");

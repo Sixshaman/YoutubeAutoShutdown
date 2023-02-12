@@ -17,7 +17,23 @@ function testAutoShutdownSignal()
     })
     .catch((_error) => 
     {
-        return Promise.reject({message: "Youtube Auto Shutdown error. Is native application installed?"});
+        return browser.runtime.getPlatformInfo().then(platformInfo => 
+        {
+            let downloadSuggestion = "Unsupported operating system";
+            let downloadLink       = "";
+            if(platformInfo.os == "win")
+            {
+                downloadSuggestion = "Download the native app";
+                downloadLink       = "https://github.com/Sixshaman/YoutubeAutoShutdown/releases/latest/download/YoutubeAutoShutdown-NativeApp-Windows.zip";
+            }
+            else if(platformInfo.os == "linux")
+            {
+                downloadSuggestion = "Download the native app"
+                downloadLink       = "https://github.com/Sixshaman/YoutubeAutoShutdown/releases/latest/download/YoutubeAutoShutdown-NativeApp-Linux.zip";
+            }
+    
+            return Promise.reject({message: "Youtube Auto Shutdown error. ", suggestion: downloadSuggestion, link: downloadLink});
+        });
     });
 }
 
@@ -125,8 +141,12 @@ function handleContentScriptMessage(request, sender, sendResponse)
             .catch((error) => 
             {
                 //Native app error, ask the tab to show error header
-                let scriptRequest = {message: "ytshutdown_show_error", payload: error.message};
-                return browser.tabs.sendMessage(request.tabId, scriptRequest);
+                let requestPayload = {message: error.message, suggestion: error.suggestion, link: error.link};
+                let scriptRequest = {message: "ytshutdown_show_error", payload: requestPayload};
+                return browser.tabs.sendMessage(request.tabId, scriptRequest).then(() =>
+                {
+                    return Promise.reject();
+                });
             });
         }
     }
