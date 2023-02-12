@@ -150,19 +150,12 @@ jobs:
     - name: Set uninstall script executable
       run: sudo chmod +x YoutubeAutoShutdown-Linux/uninstall.sh
         
-        
     - name: Zip release (main extension)
-      uses: montudor/action-zip@v1
-      with:
-        args: zip -qq -r "YoutubeAutoShutdown-WebExtension.zip" "YoutubeAutoShutdown-Web"
+      run: (cd YoutubeAutoShutdown-Web && zip -qq -r ../YoutubeAutoShutdown-WebExtension.zip .)
     - name: Zip release (Windows native app)
-      uses: montudor/action-zip@v1
-      with:
-        args: zip -qq -r "YoutubeAutoShutdown-NativeApp-Windows.zip" "YoutubeAutoShutdown-Windows"
+      run: (cd YoutubeAutoShutdown-Windows && zip -qq -r ../YoutubeAutoShutdown-NativeApp-Windows.zip .)
     - name: Zip release (Linux native app)
-      uses: montudor/action-zip@v1
-      with:
-        args: zip -qq -r "YoutubeAutoShutdown-NativeApp-Linux.zip" "YoutubeAutoShutdown-Linux"
+      run: (cd YoutubeAutoShutdown-Linux && zip -qq -r ../YoutubeAutoShutdown-NativeApp-Linux.zip .)
     - name: Get release name
       id: release_name
       run: echo "::set-output name=relname::$(date +'Build %Y-%m-%d %H:%M:%S')"
