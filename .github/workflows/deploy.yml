@@ -150,6 +150,11 @@ jobs:
     - name: Set uninstall script executable
       run: sudo chmod +x YoutubeAutoShutdown-Linux/uninstall.sh
         
+    - name: Test
+      run: ls ./
+      
+    - name: Test2
+      run: ls YoutubeAutoShutdown-Web/
         
     - name: Zip release (main extension)
       uses: montudor/action-zip@v1
