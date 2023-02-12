@@ -159,7 +159,7 @@ jobs:
     - name: Zip release (main extension)
       uses: montudor/action-zip@v1
       with:
-        args: -qq -r "YoutubeAutoShutdown-WebExtension.zip" YoutubeAutoShutdown-Web
+        args: zip -qq -r "YoutubeAutoShutdown-WebExtension.zip" YoutubeAutoShutdown-Web
     - name: Zip release (Windows native app)
       uses: montudor/action-zip@v1
       with:
